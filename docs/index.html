@@ -13,7 +13,8 @@ header { padding:20px 24px 8px; }
 h1 { margin:0 0 4px; font-size:22px; }
 .sub { color:var(--muted); font-size:13px; }
 .controls { display:flex; flex-wrap:wrap; gap:10px; padding:14px 24px; align-items:center; }
-.controls input[type=text], .controls select { background:var(--card); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:14px; }
+.controls input[type=text], .controls input[type=date], .controls select { background:var(--card); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:14px; }
+.controls input[type=date] { color-scheme:dark; }
 .controls input[type=text] { min-width:240px; }
 .controls label.chk { display:flex; align-items:center; gap:6px; font-size:14px; color:var(--muted); cursor:pointer; user-select:none; }
 .count { margin-left:auto; color:var(--muted); font-size:13px; }
@@ -38,7 +39,7 @@ a:hover { text-decoration:underline; }
 <body>
 <header>
 <h1>Leady – spoluvlastnické podíly &amp; věcná břemena</h1>
-<div class="sub">Zdroj: ISIR + dražební portály · vygenerováno 05.07.2026 23:09</div>
+<div class="sub">Zdroj: ISIR + dražební portály · vygenerováno 05.07.2026 23:14</div>
 </header>
 <div class="controls">
 <input type="text" id="q" placeholder="Hledat (kat. území, spis. značka, LV…)">
@@ -46,6 +47,8 @@ a:hover { text-decoration:underline; }
 <label class="chk"><input type="checkbox" id="fVb"> jen s věcným břemenem</label>
 <label class="chk"><input type="checkbox" id="fBezVb"> bez věcného břemene</label>
 <label class="chk"><input type="checkbox" id="fPodil"> jen podíly</label>
+<label class="chk">od <input type="date" id="dOd"></label>
+<label class="chk">do <input type="date" id="dDo"></label>
 <select id="minSkore">
 <option value="0">Skóre: vše</option>
 <option value="5">Skóre ≥ 5</option>
@@ -78,6 +81,9 @@ function render() {
     if (bezVb && l.vecne_bremeno) return false;
     if (pd && !l.podil) return false;
     if ((l.skore||0) < ms) return false;
+    const dOd = $("dOd").value, dDo = $("dDo").value;
+    if (dOd && (!l.datum || l.datum < dOd)) return false;
+    if (dDo && (!l.datum || l.datum > dDo)) return false;
     if (q) {
       const hay = [l.spisova_znacka, l.typ_dokumentu, l.poznamka, l.velikost_podilu,
         ...(l.katastralni_uzemi||[]), ...(l.lv||[]), ...(l.parcely||[])].join(" ").toLowerCase();
@@ -109,7 +115,7 @@ document.querySelectorAll("th[data-s]").forEach(th => th.onclick = () => {
   if (sortKey === k) sortDir *= -1; else { sortKey = k; sortDir = -1; }
   render();
 });
-["q","zdroj","fVb","fBezVb","fPodil","minSkore"].forEach(id => $(id).addEventListener("input", render));
+["q","zdroj","fVb","fBezVb","fPodil","minSkore","dOd","dDo"].forEach(id => $(id).addEventListener("input", render));
 render();
 </script>
 </body>
