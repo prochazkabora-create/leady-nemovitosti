@@ -50,7 +50,7 @@ select.stav { background:var(--card); color:var(--text); border:1px solid var(--
 <body>
 <header>
 <h1>Leady – spoluvlastnické podíly &amp; věcná břemena</h1>
-<div class="sub">Zdroj: ISIR + dražební portály · vygenerováno 07.07.2026 23:18 · stav leadu se ukládá jen ve vašem prohlížeči</div>
+<div class="sub">Zdroj: ISIR + dražební portály · vygenerováno 07.07.2026 23:44 · stav leadu se ukládá jen ve vašem prohlížeči</div>
 </header>
 <div class="controls">
 <input type="text" id="q" placeholder="Hledat (kat. území, spis…)">
@@ -64,6 +64,7 @@ select.stav { background:var(--card); color:var(--text); border:1px solid var(--
 <label class="chk"><input type="checkbox" id="fBezVb"> bez VB</label>
 <label class="chk"><input type="checkbox" id="fPodil"> jen podíly</label>
 <label class="chk"><input type="checkbox" id="fAlim"> jen výživné</label>
+<label class="chk"><input type="checkbox" id="fInsol"> jen insolvence</label>
 <label class="chk"><input type="checkbox" id="fBudouci"> jen budoucí dražby</label>
 <label class="chk">od <input type="date" id="dOd"></label>
 <label class="chk">do <input type="date" id="dDo"></label>
@@ -110,6 +111,7 @@ function render() {
         kr = $("kraj").value, ok = $("okres").value,
         vb = $("fVb").checked, bezVb = $("fBezVb").checked, pd = $("fPodil").checked,
         al = $("fAlim").checked, vbByt = $("fVbByt").checked,
+        insol = $("fInsol").checked,
         cenaDo = +$("cenaDo").value || 0, fs = $("fStav").value;
   let rows = DATA.filter(l => {
     if (z && l.zdroj !== z) return false;
@@ -121,6 +123,7 @@ function render() {
     if (bezVb && l.vecne_bremeno) return false;
     if (pd && !l.podil) return false;
     if (al && !l.alimenty) return false;
+    if (insol && l.channel !== "isir" && l.channel !== "zamery") return false;
     if ($("fBudouci").checked && probehla(l)) return false;
     if (cenaDo && !(l.cena != null && l.cena <= cenaDo)) return false;
     const dOd = $("dOd").value, dDo = $("dDo").value;
@@ -197,7 +200,7 @@ document.querySelectorAll("th[data-s]").forEach(th => th.onclick = () => {
   if (sortKey === k) sortDir *= -1; else { sortKey = k; sortDir = -1; }
   render();
 });
-["q","zdroj","typN","kraj","okres","cenaDo","fVb","fVbByt","fBezVb","fPodil","fAlim","fBudouci","dOd","dDo","fStav"].forEach(id => $(id).addEventListener("input", render));
+["q","zdroj","typN","kraj","okres","cenaDo","fVb","fVbByt","fBezVb","fPodil","fAlim","fInsol","fBudouci","dOd","dDo","fStav"].forEach(id => $(id).addEventListener("input", render));
 render();
 </script>
 </body>
